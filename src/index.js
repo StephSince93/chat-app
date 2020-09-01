@@ -15,21 +15,20 @@ app.use(express.static(publicDirectoryPath))
 //let count = 0
 
 
- io.on('connection', (socket) => {
+ io.on('connection', (socket) => { // connection, default by socket.io
      console.log('New Websocket connection!')
 
-//     socket.emit('countUpdated', count)
+    socket.emit('message', 'Welcome!')
+    socket.broadcast.emit('message', 'A new user has joined!')// Emits to all client connections, except for the client connecting
 
     socket.on('sendMessage', (message) => {
-        //socket.emit('countUpdated', count) //Only emits to a specific client connection
+        //socket.emit('message', message) //Only emits to a specific client connection
         io.emit('message', message) //Emits to all client connections
     })
 
-//     socket.on('increment', () => {
-//         count++
-//         //socket.emit('countUpdated', count) //Only emits to a specific client connection
-//         io.emit('countUpdated', count) //Emits to all client connections
-//     })
+    socket.on('disconnect', () => { //disconnect, default by socket.io
+        io.emit('message','A user has left!')
+    })
  })
 
 server.listen(port, () => {
