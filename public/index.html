@@ -2,8 +2,12 @@
 <html>
     <head></head>
     <body>
-        <h1>Chat App</h1>
-        <button id="increment">+1</button>
+        <h1 id="title">Chat App</h1>
+        <!-- <button id="increment">+1</button> -->
+        <form id="textForm" >
+            <input name="message" placeholder="message">
+            <button>Submit</button>
+        </form>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/chat.js"></script>
     </body>
