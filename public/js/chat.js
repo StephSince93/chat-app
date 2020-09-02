@@ -8,7 +8,7 @@ const $messageFormButton = $messageForm.querySelector('button')
 const $locationButton = document.querySelector('#send-location')
 
 const $messages = document.querySelector('#messages')
-const $locations = document.querySelector('#locations')
+// const $locations = document.querySelector('#locations')
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
@@ -21,7 +21,7 @@ socket.on('location', (location) => {
             url: location.url,
             createdAt: moment(location.createdAt).format('h:mm a')
         })
-        $locations.insertAdjacentHTML('beforeend', html)
+    $messages.insertAdjacentHTML('beforeend', html)
 })
 
 socket.on('message', (message) => {
