@@ -7,16 +7,28 @@ const $messageFormButton = $messageForm.querySelector('button')
 
 const $locationButton = document.querySelector('#send-location')
 
+const $messages = document.querySelector('#messages')
+const $locations = document.querySelector('#locations')
+
+// Templates
+const messageTemplate = document.querySelector('#message-template').innerHTML
+const locationTemplate = document.querySelector('#location-template').innerHTML
+
 
 socket.on('location', (location) => {
-        console.log(location)
-        //document.querySelector('#title').textContent = message
-
+        console.log(locationTemplate)
+        const html = Mustache.render(locationTemplate, {
+            location
+        })
+        $locations.insertAdjacentHTML('beforeend', html)
 })
 
 socket.on('message', (message) => {
-    console.log(`${message}`)
-    document.querySelector('#title').textContent = message
+    console.log(messageTemplate)
+    const html = Mustache.render(messageTemplate, {
+        message
+    })
+    $messages.insertAdjacentHTML('beforeend', html)
 
 })
 
