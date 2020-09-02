@@ -16,8 +16,10 @@ const locationTemplate = document.querySelector('#location-template').innerHTML
 
 
 socket.on('location', (location) => {
+    console.log(location)
         const html = Mustache.render(locationTemplate, {
-            location
+            url: location.url,
+            createdAt: moment(location.createdAt).format('h:mm a')
         })
         $locations.insertAdjacentHTML('beforeend', html)
 })
