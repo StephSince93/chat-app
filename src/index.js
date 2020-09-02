@@ -17,10 +17,16 @@ app.use(express.static(publicDirectoryPath))
 
 
  io.on('connection', (socket) => { // connection, default by socket.io
-     console.log('New Websocket connection!')
 
-    socket.emit('message', generateMessage('Welcome!'))
-    socket.broadcast.emit('message', generateMessage('A new user has joined!'))// Emits to all client connections, except for the client connecting
+    
+    socket.on('join', ({username, room}) => {
+        socket.join(room)
+        
+        socket.emit('message', generateMessage('Welcome!'))
+        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))// Emits to all client connections, except for the client connecting
+        // socket.emit, io.emit, socket.broadcast.emit
+        // io.to.emit, socket.broadcast.to.emit
+    })
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()
@@ -29,7 +35,7 @@ app.use(express.static(publicDirectoryPath))
             return callback('Profanity is not allowed!')
         }
         //socket.emit('message', message) //Only emits to a specific client connection
-        io.emit('message', generateMessage(message)) //Emits to all client connections
+        io.to('Test').emit('message', generateMessage(message)) //Emits to all client connections
         callback()
     })
 
