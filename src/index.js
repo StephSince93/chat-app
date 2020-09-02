@@ -26,6 +26,11 @@ app.use(express.static(publicDirectoryPath))
         io.emit('message', message) //Emits to all client connections
     })
 
+    socket.on('sendLocation', (location) => {
+        //socket.emit('message', message) //Only emits to a specific client connection
+        io.emit('location', `https://google.com/maps?q=${location.latitude},${location.longitude}`) //Emits to all client connections
+    })
+
     socket.on('disconnect', () => { //disconnect, default by socket.io
         io.emit('message','A user has left!')
     })
