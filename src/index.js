@@ -32,27 +32,43 @@ app.use(express.static(publicDirectoryPath))
         
         socket.join(user.room)
         
-        socket.emit('message', generateMessage('Welcome!'))
-        socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))// Emits to all client connections, except for the client connecting
+        socket.emit('message', generateMessage('Admin','Welcome!'))
+        socket.broadcast.to(user.room).emit('message', generateMessage('Admin',`${user.username} has joined!`))// Emits to all client connections, except for the client connecting
 
 
         callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
+
+        const {userInfo, error} = getUser(socket.id)
+
+        if(!userInfo) {
+            return callback(error)
+        }
+        // console.log('msg',userInfo)
+
         const filter = new Filter()
 
         if(filter.isProfane(message)) {
             return callback('Profanity is not allowed!')
         }
         //socket.emit('message', message) //Only emits to a specific client connection
-        io.to('yeh').emit('message', generateMessage(message)) //Emits to all client connections
+        io.to(userInfo.room).emit('message', generateMessage(userInfo.username, message)) 
         callback()
     })
 
     socket.on('sendLocation', (location, callback) => {
         //socket.emit('message', message) //Only emits to a specific client connection
-        io.emit('location', generateLocationMessage(`https://google.com/maps?q=${location.latitude},${location.longitude}`)) //Emits to all client connections
+
+        const {userInfo, error} = getUser(socket.id)
+
+        if(!userInfo) {
+            return callback(error)
+        }
+
+        // console.log('location',userInfo)
+        io.to(userInfo.room).emit('location', generateLocationMessage(userInfo.username, `https://google.com/maps?q=${location.latitude},${location.longitude}`)) 
         callback('Location shared!')
     })
 
@@ -61,7 +77,7 @@ app.use(express.static(publicDirectoryPath))
         const user = removeUser(socket.id)
 
         if (user) {
-            io.to(user.room).emit('message',generateMessage(`${user.username} has left!`))
+            io.to(user.room).emit('message',generateMessage('Admin',`${user.username} has left!`))
         }
 
     })

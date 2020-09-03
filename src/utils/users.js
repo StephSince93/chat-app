@@ -41,12 +41,14 @@ const removeUser = (id) => {
 }
 
 const getUser = (id) => {
-    const index = users.find((user) =>  user.id === id)
+    const userInfo = users.find((user) =>  user.id === id)
 
-    if(index !== -1) {
-        return users[index]
+    if(userInfo) {
+        return {userInfo}
     }
-    return []
+    return {
+        error: 'Message could not be sent'
+    }
 }
 
 const getUsersInRoom = (room) => {
