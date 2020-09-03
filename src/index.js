@@ -34,7 +34,10 @@ app.use(express.static(publicDirectoryPath))
         
         socket.emit('message', generateMessage('Admin','Welcome!'))
         socket.broadcast.to(user.room).emit('message', generateMessage('Admin',`${user.username} has joined!`))// Emits to all client connections, except for the client connecting
-
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        })
 
         callback()
     })
@@ -78,6 +81,10 @@ app.use(express.static(publicDirectoryPath))
 
         if (user) {
             io.to(user.room).emit('message',generateMessage('Admin',`${user.username} has left!`))
+            io.to('roomData', {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            })
         }
 
     })
