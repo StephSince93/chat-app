@@ -4,6 +4,8 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const {generateMessage, generateLocationMessage} = require('./utils/messages')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
+
 const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
@@ -19,13 +21,22 @@ app.use(express.static(publicDirectoryPath))
  io.on('connection', (socket) => { // connection, default by socket.io
 
     
-    socket.on('join', ({username, room}) => {
-        socket.join(room)
+    socket.on('join', (options, callback) => {
+        console.log(options)
+        const {error, user} = addUser({id:socket.id, ...options})
+
+        if(error) {
+            return callback(error)
+        }
+
+        
+        socket.join(user.room)
         
         socket.emit('message', generateMessage('Welcome!'))
-        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))// Emits to all client connections, except for the client connecting
-        // socket.emit, io.emit, socket.broadcast.emit
-        // io.to.emit, socket.broadcast.to.emit
+        socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))// Emits to all client connections, except for the client connecting
+
+
+        callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
@@ -35,7 +46,7 @@ app.use(express.static(publicDirectoryPath))
             return callback('Profanity is not allowed!')
         }
         //socket.emit('message', message) //Only emits to a specific client connection
-        io.to('Test').emit('message', generateMessage(message)) //Emits to all client connections
+        io.to('yeh').emit('message', generateMessage(message)) //Emits to all client connections
         callback()
     })
 
@@ -46,7 +57,13 @@ app.use(express.static(publicDirectoryPath))
     })
 
     socket.on('disconnect', () => { //disconnect, default by socket.io
-        io.emit('message',generateMessage('A user has left!'))
+
+        const user = removeUser(socket.id)
+
+        if (user) {
+            io.to(user.room).emit('message',generateMessage(`${user.username} has left!`))
+        }
+
     })
  })
 
